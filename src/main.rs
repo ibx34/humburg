@@ -117,5 +117,6 @@ fn main() {
         cursor,
         res: Vec::new(),
     };
-    println!("{:?}", parser.parse_expr(None));
+    parser.parse_expr(None);
+    // println!("{:?}", parser);
 }

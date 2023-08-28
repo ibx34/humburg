@@ -56,48 +56,42 @@ where
             LexResult::Identifier(ident) => {
                 let ident = ident.to_owned();
                 let lowered_and_str = ident.to_lowercase();
+                // This gets us passed the identifer we are currently on
+                self.cursor.advance();
+                // This gets us the next character.
+                let next_peeked = self.cursor.advance()?.to_owned();
                 if PRIM_TYPES.contains(&lowered_and_str.as_str()) {
                     let r#type = TyExpr::try_from_option(&lowered_and_str)?;
                     return Some(Exprs::Ty(r#type));
                 }
-                self.cursor.advance();
-                let next_peeked = self.cursor.peek()?.to_owned();
+
                 let type_list = self.parse_expr(Some(next_peeked));
                 println!(
                     "The types in the type list for the assignment {ident:?} are: {type_list:?}"
                 );
-
+                //     }
+                //     _ => {}
+                // }
                 None
             }
             LexResult::OpenSquare => {
-                let mut till_close_square = self
-                    .cursor
-                    .iter
-                    .by_ref()
-                    .take_while(|e| e != &LexResult::CloseSquare)
-                    .collect::<Vec<LexResult>>()
-                    .into_iter()
-                    .peekable();
                 let mut types_in_type_list: Vec<Box<Exprs>> = Vec::new();
-                while let Some(n) = till_close_square.peek() {
-                    let n = n.to_owned();
-                    match n {
-                        LexResult::Dash => {
-                            till_close_square.next();
-                            if let Some(n) = till_close_square.peek() {
-                                if n == &LexResult::GreatherThan {
-                                    till_close_square.next();
-                                    continue;
-                                }
-                            }
+                while let Some(next) = self.cursor.peek() {
+                    let next = next.to_owned();
+                    match next {
+                        LexResult::CloseSquare => {
+                            self.cursor.advance();
+                            break;
                         }
-                        ident @ LexResult::Identifier(_) => {
-                            if let ty_expr @ Some(Exprs::Ty(_)) = self.parse_expr(Some(ident)) {
-                                types_in_type_list.push(Box::new(ty_expr?))
-                            }
-                            till_close_square.next();
+                        os @ LexResult::OpenSquare | os @ LexResult::Identifier(_) => {
+                            self.cursor.advance();
+                            types_in_type_list.push(Box::new(self.parse_expr(Some(os))?));
                         }
-                        _ => _ = till_close_square.next(),
+                        LexResult::Space => _ = self.cursor.advance(),
+                        unkown @ _ => {
+                            println!("Unkown: {unkown:?}");
+                            self.cursor.advance();
+                        }
                     }
                 }
                 Some(Exprs::TyList(types_in_type_list))
