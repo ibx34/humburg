@@ -1,2 +1,2 @@
-add2[Int Int [Str Int]]
-add2 x = @(y = x + y)
+# This is a lambda. 
+@(test_interanl_print_function)
