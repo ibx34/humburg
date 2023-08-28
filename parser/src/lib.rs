@@ -64,28 +64,34 @@ where
                     let r#type = TyExpr::try_from_option(&lowered_and_str)?;
                     return Some(Exprs::Ty(r#type));
                 }
-
-                let type_list = self.parse_expr(Some(next_peeked));
-                println!(
-                    "The types in the type list for the assignment {ident:?} are: {type_list:?}"
-                );
+                match next_peeked {
+                    LexResult::OpenSquare => {
+                        let type_list = self.parse_expr(Some(next_peeked));
+                        println!(
+                            "The types in the type list for the assignment {ident:?} are: {type_list:?}"
+                        );
+                    }
+                    _ => {}
+                }
                 //     }
                 //     _ => {}
                 // }
                 None
             }
+            // todo: the problem is with the advances
             LexResult::OpenSquare => {
+                // This will get us past the open square we are currently on.
                 let mut types_in_type_list: Vec<Box<Exprs>> = Vec::new();
                 while let Some(next) = self.cursor.peek() {
                     let next = next.to_owned();
                     match next {
-                        LexResult::CloseSquare => {
-                            self.cursor.advance();
-                            break;
-                        }
-                        os @ LexResult::OpenSquare | os @ LexResult::Identifier(_) => {
-                            self.cursor.advance();
-                            types_in_type_list.push(Box::new(self.parse_expr(Some(os))?));
+                        LexResult::CloseSquare => break,
+                        ref os @ LexResult::OpenSquare | ref os @ LexResult::Identifier(_) => {
+                            if os == &LexResult::OpenSquare {
+                                self.cursor.advance();
+                            }
+                            let new_expr = self.parse_expr(Some(os.to_owned()))?;
+                            types_in_type_list.push(Box::new(new_expr));
                         }
                         LexResult::Space => _ = self.cursor.advance(),
                         unkown @ _ => {
