@@ -1,0 +1,12 @@
+# Simple lexer test.
+
+# bang
+!
+# parenthesis
+()
+(
+)
+# identifier
+identifier
+# mix of all
+!identifier()
