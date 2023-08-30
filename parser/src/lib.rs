@@ -39,11 +39,16 @@ impl<A> HumburgParser<A>
 where
     A: Iterator<Item = LexResult> + Debug,
 {
+    // todo: add a peek function please... This has gotta exist in order to fill the struct's field.
     pub fn push_back(&mut self, l_res: Exprs, should_advance: bool) {
         self.res.push(l_res);
         if should_advance {
             self.cursor.advance();
         }
+    }
+
+    pub fn parse_lambda(&mut self) -> Option<Exprs> {
+        None
     }
 
     pub fn parse_expr(&mut self, to_parse: Option<LexResult>) -> Option<Exprs> {
@@ -54,10 +59,7 @@ where
         };
         match to_parse {
             LexResult::At => {
-                self.cursor.advance();
-                // This will handle lambdas and whatever else uses an at sign. before i can begin
-                // work on this, i have to figure out how i want this language to be.
-                return None
+                self.parse_lambda()
             }
             LexResult::Identifier(ident) => {
                 let ident = ident.to_owned();
