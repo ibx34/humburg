@@ -74,5 +74,5 @@ pub enum LexResult {
     Dash,
     GreatherThan,
     LessThan,
-    AtSign,
+    At,
 }

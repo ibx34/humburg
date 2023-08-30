@@ -57,6 +57,7 @@ where
                 self.cursor.advance();
                 // This will handle lambdas and whatever else uses an at sign. before i can begin
                 // work on this, i have to figure out how i want this language to be.
+                return None
             }
             LexResult::Identifier(ident) => {
                 let ident = ident.to_owned();

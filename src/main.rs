@@ -58,7 +58,7 @@ where
                 }
                 return None;
             }
-            '@' => LexResult::AtSign,
+            '@' => LexResult::At,
             '>' => LexResult::GreatherThan,
             '<' => LexResult::LessThan,
             '-' => LexResult::Dash,
@@ -74,7 +74,7 @@ where
             _ => {
                 let mut identifier = String::new();
                 while let Some(next) = self.cursor.peek() {
-                    if !next.is_alphanumeric() {
+                    if !next.is_alphanumeric() && next != &'_' {
                         break;
                     }
                     identifier.push(*next);
@@ -118,5 +118,5 @@ fn main() {
         res: Vec::new(),
     };
     parser.parse_expr(None);
-    // println!("{:?}", parser);
+    println!("{:?}", parser);
 }
