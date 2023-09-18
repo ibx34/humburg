@@ -47,7 +47,17 @@ where
         }
     }
 
+    pub fn expect_current(&mut self, expected: LexResult) -> bool {
+        let Some(ref current) = self.cursor.cc else {
+            return true;
+        };
+        current == &expected
+    }
+
     pub fn parse_lambda(&mut self) -> Option<Exprs> {
+        self.cursor.advance()?;
+
+        println!("{:?}", self.cursor.cc);
         None
     }
 
@@ -59,6 +69,8 @@ where
         };
         match to_parse {
             LexResult::At => {
+                /// get past the @ sign?
+                self.cursor.advance()?;
                 self.parse_lambda()
             }
             LexResult::Identifier(ident) => {
