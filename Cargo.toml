@@ -1,0 +1,3 @@
+[workspace]
+members = ["hg-common"]
+resolver = "2"
