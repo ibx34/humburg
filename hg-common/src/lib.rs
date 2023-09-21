@@ -8,7 +8,7 @@ where
     B: Clone + Debug,
 {
     pub iter: Peekable<A>,
-    pub current: Option<B>,
+    pub current: B,
     /// this is zero-indexed xoxo, why? fuck you future me.
     pub idx: usize,
     pub prev: Option<B>,
@@ -23,9 +23,27 @@ where
         let first = iter.nth(0)?;
         Some(Self {
             iter,
-            current: Some(first),
+            current: first,
             idx: 0,
             prev: None,
         })
+    }
+
+    pub fn advance(&mut self) -> Option<&B> {
+        self.prev = Some(self.current.to_owned());
+        let next = self.iter.next()?;
+        self.current = next;
+        self.idx += 1;
+        return Some(&self.current);
+    }
+
+    pub fn peek(&mut self) -> Option<&B> {
+        self.iter.peek()
+    }
+    pub fn peek_rev(&self) -> Option<&B> {
+        self.prev.as_ref()
+    }
+    pub fn current(&self) -> &B {
+        &self.current
     }
 }

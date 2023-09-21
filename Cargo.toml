@@ -1,3 +1,3 @@
 [workspace]
-members = ["hg-common"]
+members = ["hg-common", "hg-lex"]
 resolver = "2"
