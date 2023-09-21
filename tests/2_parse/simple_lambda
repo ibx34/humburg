@@ -1,4 +1,0 @@
-# whatever
-add = @(x = @(y = x + y))
-add_started = add 1
-add_started 2
