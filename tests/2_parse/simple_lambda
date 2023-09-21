@@ -1,2 +1,4 @@
-# This is a lambda. 
-@(test_interanl_print_function)
+# whatever
+add = @(x = @(y = x + y))
+add_started = add 1
+add_started 2

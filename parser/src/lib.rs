@@ -1,3 +1,4 @@
+#![feature(let_chains)]
 use common::{HumburgCursor, LexResult};
 use std::fmt::Debug;
 
@@ -47,6 +48,14 @@ where
         }
     }
 
+    pub fn advance_more_than_once(&mut self, to_expect: usize) -> Vec<Option<LexResult>> {
+        let mut advance_res = Vec::new();
+        for _ in 0..to_expect {
+            advance_res.push(self.cursor.advance());
+        }
+        advance_res
+    }
+
     pub fn expect_current(&mut self, expected: LexResult) -> bool {
         let Some(ref current) = self.cursor.cc else {
             return true;
@@ -54,10 +63,43 @@ where
         current == &expected
     }
 
+    /// arg_list will tell the function to expect that the cc will be an eq
     pub fn parse_lambda(&mut self) -> Option<Exprs> {
-        self.cursor.advance()?;
+        println!("Hello");
+        let argument_list = self
+            .cursor
+            .iter
+            .by_ref()
+            .take_while(|e| {
+                e != &LexResult::Space
+                    && e != &LexResult::Eq
+                    && std::mem::discriminant(e)
+                        == std::mem::discriminant(&LexResult::Identifier("".to_string()))
+            })
+            .collect::<Vec<LexResult>>();
+        println!("{:?}", argument_list);
+        /*
 
-        println!("{:?}", self.cursor.cc);
+                       let mut argument_list = Vec::new();
+               while let Some(item) = self.cursor.peek() {
+                   match item {
+                       LexResult::Space => {
+                           self.cursor.advance()?;
+                       }
+                       LexResult::Identifier(d) => {
+                           argument_list.push(item.to_owned());
+                    b       self.cursor.advance()?;
+                       }
+                       LexResult::Eq => {
+                           self.cursor.advance()?;
+                       }
+                       _ => {
+                           self.cursor.advance()?;
+                           break;
+                       }
+                   }
+               }
+        */
         None
     }
 
@@ -69,8 +111,8 @@ where
         };
         match to_parse {
             LexResult::At => {
-                /// get past the @ sign?
-                self.cursor.advance()?;
+                // get past the @ and the open parne sign?
+                self.advance_more_than_once(2);
                 self.parse_lambda()
             }
             LexResult::Identifier(ident) => {
@@ -93,9 +135,6 @@ where
                     }
                     _ => {}
                 }
-                //     }
-                //     _ => {}
-                // }
                 None
             }
             // todo: the problem is with the advances
