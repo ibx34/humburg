@@ -12,3 +12,10 @@ version = "0.1.0"
 dependencies = [
  "hg-common",
 ]
+
+[[package]]
+name = "testsss"
+version = "0.1.0"
+dependencies = [
+ "hg-lex",
+]

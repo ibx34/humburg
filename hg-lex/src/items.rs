@@ -4,4 +4,5 @@ use std::borrow::Cow;
 pub enum Item<'a> {
     String(Cow<'a, str>),
     AtSign,
+    ForwardSlash,
 }

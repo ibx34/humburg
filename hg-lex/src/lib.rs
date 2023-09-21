@@ -31,21 +31,46 @@ where
         Some(self.results.last()?)
     }
 
-    pub fn lex(&mut self, to_lex: Option<&char>) -> Option<&Item<'a>> {
-        let to_lex = if let Some(to_lex) = to_lex {
-            *to_lex
-        } else {
-            *self.indexer.current()
-        };
+    pub fn lex(&mut self, to_lex: &char) -> Option<&Item<'a>> {
         match to_lex {
-            '@' => self.push_back(Item::AtSign, false),
-            _ => None,
+            '/' => {
+                if let Some(peeked) = self.indexer.advance() {
+                    if peeked == &'/' {
+                        while let Some(next) = self.indexer.advance() {
+                            if next == &'\n' {
+                                break;
+                            }
+                            self.indexer.advance();
+                        }
+                        return None;
+                    } else if peeked == &'*' {
+                        while let Some(next) = self.indexer.advance() {
+                            if next == &'*' {
+                                if let Some(n) = self.indexer.peek() {
+                                    if n == &'/' {
+                                        break;
+                                    }
+                                }
+                            }
+                            self.indexer.advance();
+                        }
+                        return None;
+                    }
+                }
+                self.push_back(Item::ForwardSlash, true)
+            }
+            '@' => self.push_back(Item::AtSign, true),
+            a @ _ => {
+                self.indexer.advance();
+                None
+            }
         }
     }
 
     pub fn lex_all(&mut self) {
-        while let Some(_) = self.lex(None) {
-            self.indexer.advance();
+        while let Some(n) = self.indexer.peek() {
+            let peeked = n.to_owned();
+            self.lex(&peeked);
         }
     }
 }
