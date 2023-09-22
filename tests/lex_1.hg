@@ -1,9 +1,7 @@
 // single line comment
 
 /*
-
 newline
-
 */
 
-@
+@(some args go here = call())

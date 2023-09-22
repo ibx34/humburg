@@ -2,6 +2,7 @@
 pub mod items;
 use hg_common::Indexer;
 use items::Item;
+use std::borrow::Cow;
 use std::fmt::Debug;
 
 pub struct Lexer<'a, A>
@@ -59,10 +60,29 @@ where
                 }
                 self.push_back(Item::ForwardSlash, true)
             }
-            '@' => self.push_back(Item::AtSign, true),
+            '\\' => self.push_back(Item::BackSlash, true),
+            '@' => self.push_back(Item::At, true),
+            ']' => self.push_back(Item::CloseSquare, true),
+            '[' => self.push_back(Item::OpenSquare, true),
+            '(' => self.push_back(Item::OpenParenthesis, true),
+            ')' => self.push_back(Item::CloseParenthesis, true),
             a @ _ => {
-                self.indexer.advance();
-                None
+                if a.is_ascii_alphanumeric() && a != &' ' {
+                    self.indexer.advance();
+                    let mut identifier = String::new();
+                    identifier.push(*a);
+                    while let Some(n) = self.indexer.peek() {
+                        if (n == &' ' || !n.is_ascii_alphanumeric()) && n != &'_' {
+                            break;
+                        }
+                        identifier.push(n.to_owned());
+                        self.indexer.advance();
+                    }
+                    self.push_back(Item::Identifier(Cow::Owned(identifier)), false)
+                } else {
+                    self.indexer.advance();
+                    None
+                }
             }
         }
     }
