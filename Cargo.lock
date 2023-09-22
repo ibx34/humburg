@@ -3,20 +3,19 @@
 version = 3
 
 [[package]]
-name = "common"
+name = "hg-common"
 version = "0.1.0"
 
 [[package]]
-name = "humburg"
+name = "hg-lex"
 version = "0.1.0"
 dependencies = [
- "common",
- "parser",
+ "hg-common",
 ]
 
 [[package]]
-name = "parser"
+name = "testsss"
 version = "0.1.0"
 dependencies = [
- "common",
+ "hg-lex",
 ]
